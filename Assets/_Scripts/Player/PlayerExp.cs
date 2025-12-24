@@ -1,0 +1,40 @@
+using UnityEngine;
+using static Player;
+
+
+public class PlayerExp : MonoBehaviour
+{
+    [Header("EXP")]
+    [SerializeField] private int currentExp;
+    [SerializeField] private int expToLevelUp = 10;
+    [SerializeField] private int level = 1;
+    public GameState OnStateGameUpgrade;
+    private void Start()
+    {
+        // init UI
+        UIManager.instance.SettingExpUI(currentExp, expToLevelUp);
+    }
+
+    public void AddExp(int value)
+    {
+        currentExp += value;
+
+        if (currentExp >= expToLevelUp)
+        {
+            LevelUp();
+        }
+
+        UIManager.instance.SettingExpUI(currentExp, expToLevelUp);
+    }
+
+    private void LevelUp()
+    {
+        currentExp -= expToLevelUp;
+        level++;
+        expToLevelUp += 5;
+
+        Debug.Log("LEVEL UP! " + level);
+        Time.timeScale = 0f;
+        OnStateGameUpgrade?.Invoke();
+    }
+}

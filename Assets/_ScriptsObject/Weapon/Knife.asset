@@ -15,5 +15,5 @@ MonoBehaviour:
   projectileKey: sword
   projectileSpeed: 7
   weaponSprite: {fileID: 2444620274491773923, guid: 090b4d1d5105c8c4a8f9bc48977729ca, type: 3}
-  damage: 1
+  damage: 3
   cooldown: 2

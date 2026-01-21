@@ -37,8 +37,20 @@ public class EnemySpawner : MonoBehaviour
     private int aliveEnemyCount;
 
     private float spawnTimer;
-
+    private float EventTimer = 0f;
+    private float EventTimerTime = 0f;
+    private bool isEventActive = false;
     private PlayerController playerController;
+
+    [Header("Loop difficulty scaling (applied when all waves complete and we wrap)")]
+    [Tooltip("When waves loop, this int multiplier is applied to spawned enemies' health. Default 2 => double.")]
+    [SerializeField] private int healthLoopMultiplier = 2;
+    [Tooltip("When waves loop, this int multiplier is applied to spawned enemies' damage. Default 2 => double.")]
+    [SerializeField] private int damageLoopMultiplier = 2;
+
+    // Current runtime integer multipliers applied to spawned enemies (1 = normal)
+    private int currentHealthMultiplier = 1;
+    private int currentDamageMultiplier = 1;
 
     private void Awake()
     {
@@ -49,6 +61,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if (player != null)
             playerController = player.GetComponent<PlayerController>();
+        UpdateBGM();
     }
 
     private void Update()
@@ -59,7 +72,7 @@ public class EnemySpawner : MonoBehaviour
         WaveSegment segment = wave.segments[currentSegmentIndex];
 
         spawnTimer += Time.deltaTime;
-
+        EventTimer += Time.deltaTime;
         // ===== SPAWN THEO SEGMENT =====
         if (spawnedInSegment < segment.enemyCount &&
             spawnTimer >= segment.spawnDelay)
@@ -79,6 +92,34 @@ public class EnemySpawner : MonoBehaviour
         if (AllSegmentsSpawned() && aliveEnemyCount == 0)
         {
             NextWave();
+        }
+        if(EventTimer >= EventManager.instance.eventInterval)
+        {
+            EventTimer = 0f;
+            EventManager.instance.PickRandomEvent();
+            isEventActive = true;
+        }
+        if(isEventActive)
+        {
+            EventTimerTime += Time.deltaTime;
+            if(EventTimerTime >= EventManager.instance.eventTimer)
+            {
+                EventTimerTime = 0f;
+                isEventActive = false;
+                EventManager.instance.EndEvent();
+            }
+        }
+
+    }
+    private void UpdateBGM()
+    {
+        if (currentWaveIndex == waves.Length - 1)
+        {
+            AudioManager.Instance.PlayBossBGM();
+        }
+        else
+        {
+            AudioManager.Instance.PlayNormalBGM();
         }
     }
 
@@ -106,13 +147,23 @@ public class EnemySpawner : MonoBehaviour
     {
         currentWaveIndex++;
 
+        // If we've passed the last wave, wrap and apply scaling
         if (currentWaveIndex >= waves.Length)
+        {
             currentWaveIndex = 0;
+
+            // apply integer loop multipliers (double health/damage when multiplier == 2)
+            currentHealthMultiplier *= Mathf.Max(1, healthLoopMultiplier);
+            currentDamageMultiplier *= Mathf.Max(1, damageLoopMultiplier);
+
+            Debug.Log($"Waves looped. New health multiplier: {currentHealthMultiplier}, damage multiplier: {currentDamageMultiplier}");
+        }
 
         currentSegmentIndex = 0;
         spawnedInSegment = 0;
         aliveEnemyCount = 0;
         spawnTimer = 0f;
+        UpdateBGM();
     }
 
     // =========================
@@ -142,7 +193,20 @@ public class EnemySpawner : MonoBehaviour
         Vector2 dir = GetArcDirection();
         Vector3 pos = player.position + (Vector3)dir * spawnRadius;
 
-        PoolManager.Instance.Spawn(prefab.name, pos);
+        GameObject go = PoolManager.Instance.Spawn(prefab.name, pos);
+        if (go == null) return;
+
+        // Use Slime.UpgradeDataSlime to apply integer multipliers when spawning.
+        // This ensures the spawned Slime's MaxHealth and Damage are multiplied accordingly.
+        var slime = go.GetComponent<Slime>();
+        if (slime != null)
+        {
+            if (currentHealthMultiplier > 1 || currentDamageMultiplier > 1)
+            {
+                slime.UpgradeDataSlime(currentHealthMultiplier, currentDamageMultiplier);
+            }
+        }
+
         RegisterEnemy();
     }
 

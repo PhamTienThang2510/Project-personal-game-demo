@@ -132,8 +132,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Slime
   enemySO: {fileID: 11400000, guid: ca613efde997eae41acd0426489ca3a2, type: 2}
   Health: 0
+  MaxHealth: 0
+  Damage: 0
   damageTextOffset: {x: 0, y: 1.5, z: 0}
-  IsDead: 0
+  isDead: 0
+  slimeMovement: {fileID: 3569300713225490208}
 --- !u!50 &7280487365083316909
 Rigidbody2D:
   serializedVersion: 5
@@ -189,7 +192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMovement
   moveSpeed: 1
-  knockbackDistance: 0.3
+  knockbackDistance: 0.2
   knockbackDuration: 0.1
   target: {fileID: 0}
   spriteRenderer: {fileID: 369207807623840561}

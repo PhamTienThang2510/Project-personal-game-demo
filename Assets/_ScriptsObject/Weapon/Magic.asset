@@ -16,4 +16,4 @@ MonoBehaviour:
   projectileSpeed: 5
   weaponSprite: {fileID: 7583463247830642834, guid: 24fb2951b378fe94ea09ec1e4f7cd813, type: 3}
   damage: 1
-  cooldown: 0.5
+  cooldown: 1

@@ -6,7 +6,7 @@ public class PlayerExp : MonoBehaviour
 {
     [Header("EXP")]
     [SerializeField] private int currentExp;
-    [SerializeField] private int expToLevelUp = 10;
+    [SerializeField] private int expToLevelUp = 5;
     [SerializeField] private int level = 1;
     public GameState OnStateGameUpgrade;
     private void Start()

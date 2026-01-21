@@ -31,10 +31,11 @@ public class UIManager : MonoBehaviour
     [Header("Panels")]
     [SerializeField] private GameObject panelGameOver;
     [SerializeField] private GameObject panelUpgrade;
-
+    [SerializeField] private GameObject panelPause;
     [Header("Upgrade Option UI")]
 
     [SerializeField]private List<GameObject> currentWeapons = new();
+    private bool isPaused;
 
     private void Awake()
     {
@@ -48,6 +49,43 @@ public class UIManager : MonoBehaviour
         player.OnStateGameOver += ShowGameOverPanel;
         playerExp.OnStateGameUpgrade += Upgrade;
         LoadCurrentWeapon();
+
+        // Nếu bắt đầu mà chưa có vũ khí nào, mở giao diện pick (tạm dừng game) để người chơi chọn vũ khí khởi đầu
+        if (currentWeapons.Count == 0)
+        {
+            Upgrade();
+        }
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
+        }
+    }
+    public void TogglePause()
+    {
+        // Không cho pause khi game over hoặc đang upgrade
+        if (panelGameOver.activeSelf || panelUpgrade.activeSelf)
+            return;
+
+        if (isPaused)
+            ResumeGame();
+        else
+            PauseGame();
+    }
+    public void PauseGame()
+    {
+        isPaused = true;
+        Time.timeScale = 0f;
+        panelPause.SetActive(true);
+    }
+
+    public void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1f;
+        panelPause.SetActive(false);
     }
 
     // ================= HEALTH =================
@@ -74,7 +112,7 @@ public class UIManager : MonoBehaviour
     public void Replay()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
     }
 
     // ================= LOAD CURRENT WEAPON =================

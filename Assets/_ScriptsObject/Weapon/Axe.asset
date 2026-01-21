@@ -15,5 +15,5 @@ MonoBehaviour:
   projectileKey: Axe
   projectileSpeed: 5
   weaponSprite: {fileID: 4011683973332315018, guid: 9e337f73ac3fbab4a89ca79d0dc5777a, type: 3}
-  damage: 1
+  damage: 2
   cooldown: 2

@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Elite
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
   MaxHealth: 50
-  damage: 20
+  damage: 15
   AttackTime: 2
